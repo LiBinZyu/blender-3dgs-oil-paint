@@ -14,3 +14,8 @@ This tool transforms Apple ML-Sharp 3D Gaussian Splatting models into oil painti
 
 
 
+## How to use
+
+- Open `3dgs2quad.blend`, import your 3dgs file (.ply) to current scene.
+- Select your model, go to `Script` window, there should be a script showing, click `Run`.
+- It is very fast, within 10s to complete, then you go to shader window and to check everything, adjust the geometry node parameters which should be automatically added to the model as modifier.
