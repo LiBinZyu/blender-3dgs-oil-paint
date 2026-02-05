@@ -1,6 +1,9 @@
 # 3DGS Oil Painting Stylizer for Blender
 
-![](https://i.imgur.com/fBqSzUV.png)
+<div align="center" style="display: flex; gap: 8px;">
+  <img src="https://i.imgur.com/fBqSzUV.png" width="55%" />
+  <img src="https://i.imgur.com/2GcG0Vg.png" width="36%" />
+</div>
 
 This tool transforms Apple ML-Sharp 3D Gaussian Splatting models into oil painting-style 3D assets using Blender 4.5. The rendering logic utilizes a Look-Up Table (LUT) to store color data, mapping the UVs of instance planes directly to corresponding pixels. All calculations and optimizations are powered by Geometry Nodes, resulting in a lightweight shading setup that integrates seamlessly with other software. The final output can be exported as standard mesh formats, including FBX, OBJ, and GLB. The included `.blend` file contains the full setup for immediate use.
 
