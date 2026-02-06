@@ -11,7 +11,7 @@ This tool transforms Apple ML-Sharp 3D Gaussian Splatting models into oil painti
 | | |
 |:---:|:---:|
 | [![Cat](img/cat.jpg)](https://sketchfab.com/3d-models/cat-3dgs-to-oil-painting-npr-style-552533b9bb6049ad9d941b637bc9a944) | [![Venus](img/venus.jpg)](https://sketchfab.com/3d-models/the-birth-of-venus-3dgs-npr-painting-style-f1e481dce56a4c5f91ba884dc21ec352) |
-| [![Fruit](img/fruit.jpg)](https://sketchfab.com/3d-models/fruit-3dgs-oil-painting-9e460117c22042f380aaa8a169f8d1b7) | [![Boy with Basket](img/boybasket.jpg)](https://sketchfab.com/3d-models/3dgs-oil-paiting-boy-with-a-basket-of-fruit-9919fb190351484bbab96fb5ddc7711a) |
+| [![Tomato](img/tomato.jpg)](https://sketchfab.com/3d-models/fruit-3dgs-oil-painting-9e460117c22042f380aaa8a169f8d1b7) | [![Boy with Basket](img/boybasket.jpg)](https://sketchfab.com/3d-models/3dgs-oil-paiting-boy-with-a-basket-of-fruit-9919fb190351484bbab96fb5ddc7711a) |
 
 
 ## How to use
