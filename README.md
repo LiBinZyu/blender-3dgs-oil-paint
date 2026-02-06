@@ -19,7 +19,7 @@ This tool transforms 3D Gaussian Splatting models into oil painting-style 3D ass
 - Open `3dgs2quad.blend`, import your 3dgs file (.ply) to current scene.
 - Select your model, go to `Script` window, there should be a script showing, click `Run`.
 - It is very fast, within 10s to complete, then you go to shader window and to check everything, adjust the geometry node parameters which should be automatically added to the model as modifier.
-- To fix boards facing direction, add models to its lookat collection, the points near the model would be drawn to face it. Check out the ![tomato model](https://sketchfab.com/3d-models/fruit-3dgs-oil-painting-9e460117c22042f380aaa8a169f8d1b7) for instinct output, every tomato have a smaller sphere inside to draw points to face it.
+- To fix boards facing direction, add models to its lookat collection, the points near the model would be drawn to face it. Check out the [tomato model](https://sketchfab.com/3d-models/fruit-3dgs-oil-painting-9e460117c22042f380aaa8a169f8d1b7) for instinct output, every tomato have a smaller sphere inside to draw points to face it.
 
 <div align="center" style="gap: 8px;">
   <img src="https://i.imgur.com/2GcG0Vg.png" width="80%" />
