@@ -21,7 +21,7 @@ Simple tool to download and reconstruct 3D Gaussian Splatting models from SuperS
 
 ## Method 2 (Command Line):
    python rip_supersplat.py [MODEL_ID]
-   > Example: python rip_supersplat.py 3e11b126
+   > Example: python rip_supersplat.py 0101ad57
 
 ## Output
 

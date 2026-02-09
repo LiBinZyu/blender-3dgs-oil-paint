@@ -1,0 +1,14 @@
+schema_version = "1.0.0"
+
+id = "gs_oil_paint"
+version = "1.0.0"
+name = "3DGS Oil Paint"
+tagline = "Import 3DGS PLY, bake Palette Texture and setup Geometry Nodes."
+maintainer = "Bingru Li"
+type = "add-on"
+
+blender_version_min = "4.2.0"
+
+[permissions]
+files = "Import PLY files and save textures"
+network = "files"

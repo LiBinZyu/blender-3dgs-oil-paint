@@ -1,0 +1,48 @@
+# Blender
+*.blend1
+*.blend@
+*.qv
+*.autosave
+user-config.py
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.mypy_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+
+# Project Specific
+# Ignore ripped data folder
+supersplat-rip/
+# Ignore temp or large files if needed (uncomment if desired)
+# *.ply
