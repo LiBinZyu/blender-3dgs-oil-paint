@@ -1,6 +1,6 @@
 # 3DGS Oil Painting Stylizer
 
-This Blender 4.5+ addon transforms 3D Gaussian Splatting (3DGS) models into stylized oil painting assets. It uses a custom **Geometry Nodes** setup and **LUT-based color baking** to create lightweight, exportable meshes that mimic brush strokes.
+This Blender addon transforms 3D Gaussian Splatting (3DGS) models into stylized oil painting assets. It uses a custom **Geometry Nodes** setup and **LUT-based color baking** to create lightweight, exportable meshes that mimic brush strokes.
 
 All calculations are optimized for performance. The final output is standard mesh geometry with baked textures, compatible with other 3D software and game engines (FBX, OBJ, GLB).
 
@@ -8,7 +8,7 @@ All calculations are optimized for performance. The final output is standard mes
 
 **3DGS 油画风格化插件**
 
-本插件基于 Blender 4.5+ 开发，可将 3DGS 模型一键转化为油画风格的 3D 资产。核心利用**几何节点（Geometry Nodes）**与**LUT 颜色烘焙**技术，将复杂的点云数据重构为带有笔触质感的低模网格。
+本插件基于 Blender 开发，可将 3DGS 模型一键转化为油画风格的 3D 资产。核心利用**几何节点（Geometry Nodes）**与**LUT 颜色烘焙**技术，将复杂的点云数据重构为带有笔触质感的低模网格。
 
 生成的模型完全是标准的 Mesh 数据，兼容性极佳，可直接导出为 FBX、OBJ 或 GLB 格式用于其他渲染引擎或游戏开发。
 
@@ -25,8 +25,8 @@ All calculations are optimized for performance. The final output is standard mes
 
 ## 🚀 Installation / 安装
 
-1. Download the latest release `.zip` file.
-2. Open Blender (4.5 or later).
+1. Download as `.zip` file.
+2. Open Blender (4.2 or later).
 3. Go to `Edit > Preferences > Add-ons`.
 4. Click `Install...` and select the zip file.
 5. Enable the addon **"3DGS Oil Paint"**.
@@ -49,16 +49,7 @@ The addon adds a new panel to the 3D Viewport sidebar (press `N` to toggle).
 
 3. **Export**:
    - Once satisfied, click **Export...** to save your stylized model.
-
----
-
-## 🔧 Features
-
-- **One-Click Import**: Handles standard `.ply` files with optimized parsing.
-- **Palette Baking**: Automatically generates a 256x256 color LUT (Lossless or Quantized) for efficient rendering.
-- **Brush Library**: Built-in library of oil paint brush strokes (Normal & Alpha maps).
-- **Geometry Nodes**: Fully procedural placement of brush strokes based on splat scale and rotation.
-- **Real-time Preview**: What you see in viewport is what you get.
+ 
 
 <div align="center" style="gap: 8px;">
   <img src="https://i.imgur.com/2GcG0Vg.png" width="80%" />
