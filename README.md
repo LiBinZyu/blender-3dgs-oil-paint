@@ -51,6 +51,6 @@ The addon adds a new panel to the 3D Viewport sidebar (press `N` to toggle).
    - Once satisfied, click **Export...** to save your stylized model.
  
 
-<div align="center" style="gap: 8px;">
-  <img src="https://i.imgur.com/2GcG0Vg.png" width="80%" />
+<div align="center" >
+  <img src="img/painting.jpg" width="80%" />
 </div>
