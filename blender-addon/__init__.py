@@ -8,7 +8,7 @@ import mathutils
 import os
 import bpy.utils.previews
 import bpy.utils.previews
-from .geometry_node import create_gs_node_system
+# from .geometry_node import create_gs_node_system
 from .shader import create_shader
 
 bl_info = {
@@ -27,8 +27,8 @@ bl_info = {
 
 def read_ply_data(filepath):
     """
-    一个极简的高性能 PLY 读取器，专门针对 3DGS 格式优化。
-    返回一个字典，包含 numpy arrays。
+    A minimal high-performance PLY reader optimized for 3DGS format.
+    Returns a dictionary of numpy arrays.
     """
     with open(filepath, 'rb') as f:
         # Header Parsing
@@ -163,8 +163,11 @@ def get_brush_textures_callback(self, context):
         if f.lower().endswith(valid_exts):
             image_files.append(f)
             
+    # Sort immediately after filtering to guarantee order stability
+    image_files.sort()
+            
     if not image_files:
-        return [("NONE", "No Images Found", "", 0, 0)]
+        return [("NONE", "No Images Found", "", 0)]
 
     # 3. Ensure Preview Collection
     pcoll = preview_collections.get("main")
@@ -175,10 +178,29 @@ def get_brush_textures_callback(self, context):
             pcoll.brush_dir = ""
             preview_collections["main"] = pcoll
         except:
-            return [("NONE", "Pcoll Error", "", 0, 0)]
+             return [("NONE", "Pcoll Error", "", 0, 0)]
+
+    # === FIXED CACHING LOGIC ===
+    # Only rebuild the list if it's empty or explicitly cleared.
+    # Re-building it every frame causes the UI ID mismatch ("jumping names").
+    # Renamed to _v2 to force refresh after sorting update.
+    if not hasattr(pcoll, "my_items_cache_v2"):
+        pcoll.my_items_cache_v2 = []
+        
+    if pcoll.my_items_cache_v2:
+        return pcoll.my_items_cache_v2
 
     # 4. Build Items List (Standard 5-tuple)
     items = []
+    
+    # Sort image_files NATURALLY (e.g. 1, 2, 10 instead of 1, 10, 2)
+    # This prevents user confusion with numbered brush files.
+    import re
+    def natural_key(text):
+        return [int(c) if c.isdigit() else c.lower() for c in re.split(r'(\d+)', text)]
+    
+    image_files.sort(key=natural_key)
+    
     for i, name in enumerate(image_files):
         # Unique ID is file name
         filepath = os.path.join(brush_path, name)
@@ -191,12 +213,16 @@ def get_brush_textures_callback(self, context):
                 print(f"[GS_Tool_DEBUG] Failed to load {name}: {e}")
                 continue
         
-        # Get icon ID
-        icon_id = pcoll[name].icon_id
+        # Get icon ID safely
+        icon_id = 0
+        if name in pcoll:
+             icon_id = pcoll[name].icon_id
         
         # Add to list: (identifier, name, description, icon, unique_number)
-        # Using filename as both ID and Name to keep things simple
         items.append((name, name, "", icon_id, i))
+    
+    # Cache the result!
+    pcoll.my_items_cache_v2 = items
         
     return items if items else [("NONE", "None", "", 0, 0)]
 
@@ -233,7 +259,7 @@ class GS_Processor:
 
     @classmethod
     def process_and_bake(cls, context, filepath):
-        # 0. 获取用户选择的资源
+        # 0. Get user selections
         target_mat_name = context.scene.gs_target_material
         target_mesh_name = context.scene.gs_target_mesh
         target_mesh_name = context.scene.gs_target_mesh
@@ -271,11 +297,11 @@ class GS_Processor:
         
         start_time = time.time()
         
-        # 1. 读取 PLY
+        # 1. Load PLY data
         cls.log(f"Loading: {filepath}")
         ply_data, n_points = read_ply_data(filepath)
         
-        # 2. 提取并处理基础数据 (NumPy Vectorization)
+        # 2. Extract and process basic data (NumPy Vectorization)
         # Position
         xyz = np.stack((ply_data['x'], ply_data['y'], ply_data['z']), axis=1)
         
@@ -382,7 +408,7 @@ class GS_Processor:
             e = q.to_euler()
             rot_euler_data[i] = (e.x, e.y, e.z)
 
-        # 3. 颜色处理 (SH -> RGB)
+        # 3. Process Colors (SH -> RGB)
         if 'f_dc_0' in ply_data.dtype.names:
             SH_C0 = 0.28209479177387814
             r = ply_data['f_dc_0'] * SH_C0 + 0.5
@@ -404,11 +430,11 @@ class GS_Processor:
             cls.log("Source is sRGB. Skipping gamma correction.")
 
         # ---------------------------------------------------------
-        # 4. 烘焙算法 (移植自 3dgs2quad.py)
+        # 4. Baking Algorithm (Ported from 3dgs2quad.py)
         # ---------------------------------------------------------
         cls.log("Analyzing colors for Palette baking...")
         
-        # 转为 Int 进行去重分析
+        # Convert to Int for deduplication
         cols_u8 = (cols * 255.0).astype(np.int32)
         packed_colors = (cols_u8[:, 0] << 16) | (cols_u8[:, 1] << 8) | cols_u8[:, 2]
         unique_packed, inverse_indices = np.unique(packed_colors, return_inverse=True)
@@ -446,7 +472,7 @@ class GS_Processor:
             cls.log(f"Mode B: Grid Quantization ({unique_count} colors -> Grid)")
             q_level = cls.GRID_FALLBACK_LEVEL
             
-            # 生成 LUT
+            # Generate LUT
             q_range = np.arange(q_level)
             R, G, B = np.meshgrid(q_range, q_range, q_range, indexing='ij')
             colors_flat = np.stack([R.flatten(), G.flatten(), B.flatten()], axis=1) / (q_level - 1)
@@ -473,14 +499,14 @@ class GS_Processor:
             final_point_ranks = lut_3d_map[indices[:, 0], indices[:, 1], indices[:, 2]]
 
         # ---------------------------------------------------------
-        # 5. 创建 Blender 对象
+        # 5. Create Blender Object
         # ---------------------------------------------------------
         cls.log("Creating Mesh...")
         mesh = bpy.data.meshes.new(name="GS_Mesh")
         mesh.from_pydata(xyz.tolist(), [], [])
         mesh.update()
         
-        # 写入 Attributes
+        # Write Attributes
         cls._write_attribute(mesh, "scale", 'FLOAT_VECTOR', scales)
         cls._write_attribute(mesh, "logscale", 'FLOAT_VECTOR', log_scales)
         cls._write_attribute(mesh, "rot_euler", 'FLOAT_VECTOR', rot_euler_data)
@@ -491,7 +517,7 @@ class GS_Processor:
         cls._write_attribute(mesh, "opacity", 'FLOAT', opacities)
         cls._write_attribute(mesh, "log_opacity", 'FLOAT', log_opacities)
         
-        # 计算并写入 Palette UV
+        # Compute and write Palette UV
         u_coords = ((final_point_ranks % cls.PALETTE_SIZE) + 0.5) / cls.PALETTE_SIZE
         v_coords = ((final_point_ranks // cls.PALETTE_SIZE) + 0.5) / cls.PALETTE_SIZE
         uv_data = np.stack((u_coords, v_coords), axis=1)
@@ -500,7 +526,7 @@ class GS_Processor:
         cls._write_attribute(mesh, "palette_uv", 'FLOAT_VECTOR', uv_data_3d)
 
         # ---------------------------------------------------------
-        # 6. 创建 Texture 和 Material
+        # 6. Create Texture and Material
         # ---------------------------------------------------------
         obj_name = bpy.path.display_name_from_filepath(filepath)
         obj = bpy.data.objects.new(obj_name, mesh)
@@ -508,7 +534,7 @@ class GS_Processor:
         context.view_layer.objects.active = obj
         obj.select_set(True)
         
-        # A. 创建 Texture
+        # A. Create Texture
         tex_name = f"{obj.name}_Palette_Lut"
         if tex_name in bpy.data.images:
             bpy.data.images.remove(bpy.data.images[tex_name])
@@ -529,7 +555,7 @@ class GS_Processor:
         image.pixels.foreach_set(pixels)
         image.pack()
         
-        # B. 创建并设置材质 (Shader Node Tree setup)
+        # B. Establish Shader Node Tree
         # Create new material
         mat_name = f"GSmat_{obj.name}"
         new_mat = bpy.data.materials.new(name=mat_name)
@@ -610,42 +636,66 @@ class GS_Processor:
         # ---------------------------------------------------------
         # 7. Geometry Nodes Setup
         # ---------------------------------------------------------
+
+        # 1. Ensure GS_Instancer node tree is loaded
+        gn_tree_name = "GS_Instancer"
+        gn_tree = None
+
+        # Check if exists
+        if gn_tree_name in bpy.data.node_groups:
+            gn_tree = bpy.data.node_groups[gn_tree_name]
         
-        # Create Instance Object if mesh is selected
+        # Load from asset.blend if missing
+        if not gn_tree:
+             asset_path = AssetManager.get_asset_path()
+             with bpy.data.libraries.load(asset_path, link=False) as (data_from, data_to):
+                 if gn_tree_name in data_from.node_groups:
+                     data_to.node_groups = [gn_tree_name]
+             
+             if data_to.node_groups:
+                 gn_tree = data_to.node_groups[0]
+        
+        if not gn_tree:
+            cls.log(f"ERROR: Could not load Geometry Node '{gn_tree_name}' from asset.blend")
+            return {'CANCELLED'}
+
+        # 2. Load template mesh from Object Assets (if selected)
+        # Note: Assets are already imported by AssetManager.import_all_assets()
+        
         instance_obj = None
         if template_mesh:
-            instance_obj = bpy.data.objects.new(f"Inst_{obj_name}", template_mesh)
-            # Link to scene but hide it? Or put in a special collection?
-            # Putting it in current collection but hidden
-            context.collection.objects.link(instance_obj)
-            instance_obj.hide_viewport = True
-            instance_obj.hide_render = True
-        
-        # Generate Fresh Node Tree
-        gn_tree = create_gs_node_system()
-        gn_tree.name = f"GS_Instancer_{obj_name}" # Rename to be unique
-        
+             # Create temporary object using template mesh
+             instance_obj = bpy.data.objects.new(f"Inst_{obj_name}", template_mesh)
+             context.collection.objects.link(instance_obj)
+             instance_obj.hide_viewport = True
+             instance_obj.hide_render = True
+
+        # 3. Add modifier and apply node tree
         mod = obj.modifiers.new("GS_Instancer", 'NODES')
-        mod.node_group = gn_tree
+        mod.node_group = gn_tree 
         
-        # Assign Inputs
+        # 4. Set Input Parameters
         if instance_obj:
             try:
-                # Find the socket identifier or name
-                # GN inputs can be accessed by name if unique, but identifier is robust
-                # We can iterate the interface
+                # Find inputs by name or identifier for robustness
+                found_socket = False
                 for item in gn_tree.interface.items_tree:
                     if item.name == "instance" and item.bl_socket_idname == 'NodeSocketObject':
                          mod[item.identifier] = instance_obj
+                         found_socket = True
                     elif item.name == "Material" and item.bl_socket_idname == 'NodeSocketMaterial':
                          if new_mat:
                             mod[item.identifier] = new_mat
+                
+                if not found_socket:
+                    cls.log("WARNING: Could not find 'instance' socket in GS_Instancer node tree.")
+                    
             except Exception as e:
                 cls.log(f"Error setting GN inputs: {e}")
         else:
              cls.log("WARNING: No Instance Object to assign to GN!")
 
-        # 旋转物体以修正坐标系 (Rotate object -90 on X)
+        # Rotate object to correct coordinate system (-90 on X)
         if y_up_to_z_up:
             obj.rotation_euler = (np.radians(-90), 0, 0)
         else:

@@ -6,6 +6,8 @@ name = "3DGS Oil Paint"
 tagline = "Import 3DGS PLY, bake Palette Texture and setup Geometry Nodes."
 maintainer = "Bingru Li"
 type = "add-on"
+license = ["SPDX:GPL-2.0-or-later"]
+website = "https://github.com/LiBinZyu/blender-3dgs-oil-paint"
 
 blender_version_min = "4.2.0"
 

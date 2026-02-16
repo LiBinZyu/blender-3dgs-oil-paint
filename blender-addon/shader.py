@@ -41,15 +41,10 @@ def create_shader(material: bpy.types.Material, palette_img=None, alpha_img=None
     principled_bsdf.name = "Principled BSDF"
     principled_bsdf.location = (-220.6577606201172, 88.90316772460938)
     
-    # Set BSDF Defaults (based on your snippet)
-    principled_bsdf.distribution = 'MULTI_GGX'
-    principled_bsdf.subsurface_method = 'RANDOM_WALK'
-    principled_bsdf.inputs['Metallic'].default_value = 0.0
-    principled_bsdf.inputs['Roughness'].default_value = 0.468
-    principled_bsdf.inputs['IOR'].default_value = 1.45
-    principled_bsdf.inputs['Specular IOR Level'].default_value = 0.5
-    # Remove Emission default unless needed
-    # principled_bsdf.inputs['Emission Strength'].default_value = 1.0 
+    # Set BSDF Defaults safely
+    # We only care about Base Color and Alpha. 
+    # Rely on Blender defaults for other channels to avoid API breakage.
+    pass 
 
     # 1. Palette Texture (Base Color) -> Image Texture
     # Driven by ColUV (UV Map.001)
