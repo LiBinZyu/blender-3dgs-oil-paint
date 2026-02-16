@@ -734,14 +734,7 @@ class GS_OT_Import(bpy.types.Operator):
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
 
-class GS_OT_Export(bpy.types.Operator):
-    """Open standard Export Menu"""
-    bl_idname = "gs_tools.export_menu"
-    bl_label = "Export Model..."
-    
-    def execute(self, context):
-        bpy.ops.wm.call_menu(name="TOPBAR_MT_file_export")
-        return {'FINISHED'}
+
 
 class GS_PT_Panel(bpy.types.Panel):
     bl_label = "3DGS Palette Tools"
@@ -777,9 +770,7 @@ class GS_PT_Panel(bpy.types.Panel):
         else:
             box.label(text="Select object and edit modifier", icon='INFO')
             
-        box = layout.box()
-        box.label(text="Export", icon='EXPORT')
-        box.operator(GS_OT_Export.bl_idname, text="Export...")
+
 
 # ==============================================================================
 #  REGISTRATION
@@ -787,7 +778,6 @@ class GS_PT_Panel(bpy.types.Panel):
 
 classes = (
     GS_OT_Import,
-    GS_OT_Export,
     GS_PT_Panel,
 )
 
